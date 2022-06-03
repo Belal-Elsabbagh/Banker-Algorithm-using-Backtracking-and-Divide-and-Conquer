@@ -2,22 +2,12 @@
 //
 
 #include <iostream>
+#include <vector>
 #include "BankerAlgorithm.h"
-
-void print_matrix(vector<vector<int>> mat)
-{
-    for (size_t i = 0; i < mat.size(); i++)
-    {
-        for (size_t j = 0; j < mat[i].size(); j++)
-        {
-            cout << mat[i][j] << "\t";
-        }
-        cout << "\n";
-    }
-}
 
 int main()
 {
+
     BankerAlgorithm test(5, 3);
 
     test.add_allocation(0, 0, 0);
@@ -56,6 +46,6 @@ int main()
     test.add_available(1, 3);
     test.add_available(2, 2);
 
-    cout << "The safe ways to execute are:\n";
-    print_matrix(test.get_safe_sequences());
+    test.get_safe_sequences();
+    test.print_solution();
 }
