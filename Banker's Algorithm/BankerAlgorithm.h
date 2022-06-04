@@ -16,9 +16,14 @@ public:
 	bool check_safety(vector<int> test_sequence);
 	void calculate_need();
 	void get_safe_sequences();
+
+	// edit the add functions 
+
+	bool request(size_t process, vector <int> requested_resource);
+
+
 	matrix get_need() { return need; }
 	void print_solution();
-
 
 private:
 	const size_t numOfProcesses, numOfResourceTypes;
@@ -30,7 +35,7 @@ private:
 	bool process_is_safe_to_run(int current_process, vector<int> work);
 	void run_process(int current_process, vector<int>& work);
 	template<class T>
-	void swap(T& x, T& y) 
+	void swap(T& x, T& y)
 	{
 		T temp = x; x = y; y = temp;
 	}
@@ -40,7 +45,7 @@ private:
 inline BankerAlgorithm::BankerAlgorithm(size_t numOfProcesses, size_t numOfResourceTypes)
 	: numOfProcesses(numOfProcesses),
 	numOfResourceTypes(numOfResourceTypes),
-	available(numOfResourceTypes),
+	available(numOfResourceTypes, 0),
 	max(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
 	allocation(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
 	need(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
@@ -54,17 +59,17 @@ inline BankerAlgorithm::BankerAlgorithm(size_t numOfProcesses, size_t numOfResou
 
 void BankerAlgorithm::add_allocation(size_t process, size_t resource, const int val)
 {
-	allocation[process][resource] = val;
+	allocation[process][resource] += val;
 }
 
 void BankerAlgorithm::add_max(size_t process, size_t resource, const int val)
 {
-	max[process][resource] = val;
+	max[process][resource] += val;
 }
 
 void BankerAlgorithm::add_available(size_t resource, const int val)
 {
-	available[resource] = val;
+	available[resource] += val;
 }
 
 void BankerAlgorithm::calculate_need()
@@ -114,6 +119,7 @@ inline void BankerAlgorithm::print_matrix(vector<vector<int>> mat)
 
 void BankerAlgorithm::get_safe_sequences()
 {
+	safe_sequences = vector<vector<int>>();
 	calculate_need();
 	generate_safe_sequences(sequence, 0, numOfProcesses - 1);
 }
@@ -136,4 +142,17 @@ bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 		run_process(current_process, work);
 	}
 	return true;
+}
+bool BankerAlgorithm::request(size_t process, vector <int> requested_resource) {
+	bool grant = true;
+
+	for (int i = 0; i < numOfResourceTypes; i++) 
+	{
+		available.at(i) -= requested_resource.at(i);
+		need.at(process).at(i) -= requested_resource.at(i);
+		add_allocation(process, i, requested_resource.at(i));
+	}
+	get_safe_sequences();
+	if (safe_sequences.empty()) grant= false;
+	return grant;
 }

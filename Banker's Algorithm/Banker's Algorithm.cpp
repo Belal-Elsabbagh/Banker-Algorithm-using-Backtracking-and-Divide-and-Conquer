@@ -7,7 +7,6 @@
 
 int main()
 {
-
     BankerAlgorithm test(5, 3);
 
     test.add_allocation(0, 0, 0);
@@ -46,6 +45,12 @@ int main()
     test.add_available(1, 3);
     test.add_available(2, 2);
 
-    test.get_safe_sequences();
-    test.print_solution();
+    bool res = test.request(2, {3,0,0});
+    if (res)
+    {
+        cout << "This request can be granted.";
+        return 0;
+    }
+    cout << "Request denied.";
+    return 0;
 }
