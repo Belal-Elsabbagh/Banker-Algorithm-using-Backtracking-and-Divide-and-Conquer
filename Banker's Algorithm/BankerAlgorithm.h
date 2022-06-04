@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 typedef vector<vector<int>> matrix;
@@ -72,11 +73,36 @@ void BankerAlgorithm::add_available(size_t resource, const int val)
 	available[resource] += val;
 }
 
+inline void BankerAlgorithm::print_matrix(vector<vector<int>> mat)
+{
+	for (size_t i = 0; i < mat.size(); i++)
+	{
+		for (size_t j = 0; j < mat[i].size(); j++)
+			cout << mat[i][j] << " ";
+		cout << "\n";
+	}
+}
+
+inline void BankerAlgorithm::print_solution()
+{
+	cout << "The safe ways to execute are:\n";
+	print_matrix(safe_sequences);
+}
+
 void BankerAlgorithm::calculate_need()
 {
 	for (size_t i = 0; i < numOfProcesses; i++)
 		for (size_t j = 0; j < numOfResourceTypes; j++)
 			need[i][j] = max[i][j] - allocation[i][j];
+}
+
+/*----------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void BankerAlgorithm::get_safe_sequences()
+{
+	safe_sequences = vector<vector<int>>();
+	calculate_need();
+	generate_safe_sequences(sequence, 0, numOfProcesses - 1);
 }
 
 void BankerAlgorithm::generate_safe_sequences(vector<int> sequence, int low, int high)
@@ -94,42 +120,6 @@ void BankerAlgorithm::generate_safe_sequences(vector<int> sequence, int low, int
 	}
 }
 
-inline bool BankerAlgorithm::process_is_safe_to_run(int current_process, vector<int> work)
-{
-	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
-		if (need[current_process][current_resource] > work[current_resource]) return false;
-	return true;
-}
-
-inline void BankerAlgorithm::run_process(int current_process, vector<int>& work)
-{
-	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
-		work[current_resource] += allocation[current_process][current_resource];
-}
-
-inline void BankerAlgorithm::print_matrix(vector<vector<int>> mat)
-{
-	for (size_t i = 0; i < mat.size(); i++)
-	{
-		for (size_t j = 0; j < mat[i].size(); j++)
-			cout << mat[i][j] << " ";
-		cout << "\n";
-	}
-}
-
-void BankerAlgorithm::get_safe_sequences()
-{
-	safe_sequences = vector<vector<int>>();
-	calculate_need();
-	generate_safe_sequences(sequence, 0, numOfProcesses - 1);
-}
-
-inline void BankerAlgorithm::print_solution()
-{
-	cout << "The safe ways to execute are:\n";
-	print_matrix(safe_sequences);
-}
-
 bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 {
 	vector<int> work(available);
@@ -143,16 +133,30 @@ bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 	}
 	return true;
 }
+
+inline bool BankerAlgorithm::process_is_safe_to_run(int current_process, vector<int> work)
+{
+	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
+		if (need[current_process][current_resource] > work[current_resource]) return false;
+	return true;
+}
+
+inline void BankerAlgorithm::run_process(int current_process, vector<int>& work)
+{
+	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
+		work[current_resource] += allocation[current_process][current_resource];
+}
+
 bool BankerAlgorithm::request(size_t process, vector <int> requested_resource) {
 	bool grant = true;
 
-	for (int i = 0; i < numOfResourceTypes; i++) 
+	for (int i = 0; i < numOfResourceTypes; i++)
 	{
 		available.at(i) -= requested_resource.at(i);
 		need.at(process).at(i) -= requested_resource.at(i);
 		add_allocation(process, i, requested_resource.at(i));
 	}
 	get_safe_sequences();
-	if (safe_sequences.empty()) grant= false;
+	if (safe_sequences.empty()) grant = false;
 	return grant;
 }
