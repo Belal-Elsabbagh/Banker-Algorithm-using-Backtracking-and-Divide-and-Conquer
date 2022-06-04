@@ -8,20 +8,7 @@ typedef vector<vector<int>> matrix;
 class BankerAlgorithm
 {
 public:
-	BankerAlgorithm(size_t np, size_t nr)
-		: num_of_processes(np),
-		num_of_resource_types(nr),
-		available(nr),
-		max(np, vector<int>(nr, 0)),
-		allocation(np, vector<int>(nr, 0)),
-		need(np, vector<int>(nr, 0)),
-		sequence(np)
-	{
-		for (size_t i = 0; i < np; i++)
-		{
-			sequence[i] = i + 1;
-		}
-	}
+	BankerAlgorithm(size_t numOfProcesses, size_t numOfResourceTypes);
 	void add_allocation(size_t process, size_t resource, const int val);
 	void add_max(size_t process, size_t resource, const int val);
 	void add_available(size_t resource, const int val);
@@ -34,7 +21,7 @@ public:
 
 
 private:
-	const size_t num_of_processes, num_of_resource_types;
+	const size_t numOfProcesses, numOfResourceTypes;
 	vector<int> available;
 	matrix max, need, allocation;
 	vector<int> sequence;
@@ -47,6 +34,21 @@ private:
 	}
 	void print_matrix(vector<vector<int>> mat);
 };
+
+inline BankerAlgorithm::BankerAlgorithm(size_t numOfProcesses, size_t numOfResourceTypes)
+	: numOfProcesses(numOfProcesses),
+	numOfResourceTypes(numOfResourceTypes),
+	available(numOfResourceTypes),
+	max(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
+	allocation(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
+	need(numOfProcesses, vector<int>(numOfResourceTypes, 0)),
+	sequence(numOfProcesses)
+{
+	for (size_t i = 0; i < numOfProcesses; i++)
+	{
+		sequence[i] = i + 1;
+	}
+}
 
 void BankerAlgorithm::add_allocation(size_t process, size_t resource, const int val)
 {
@@ -65,8 +67,8 @@ void BankerAlgorithm::add_available(size_t resource, const int val)
 
 void BankerAlgorithm::calculate_need()
 {
-	for (size_t i = 0; i < num_of_processes; i++)
-		for (size_t j = 0; j < num_of_resource_types; j++)
+	for (size_t i = 0; i < numOfProcesses; i++)
+		for (size_t j = 0; j < numOfResourceTypes; j++)
 			need[i][j] = max[i][j] - allocation[i][j];
 }
 
@@ -98,7 +100,7 @@ inline void BankerAlgorithm::print_matrix(vector<vector<int>> mat)
 void BankerAlgorithm::get_safe_sequences()
 {
 	calculate_need();
-	generate_safe_sequences(sequence, 0, num_of_processes - 1);
+	generate_safe_sequences(sequence, 0, numOfProcesses - 1);
 }
 
 inline void BankerAlgorithm::print_solution()
@@ -110,9 +112,9 @@ inline void BankerAlgorithm::print_solution()
 bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 {
 	vector<int> work(available);
-	vector<bool> finished_processes(num_of_resource_types, false);
+	vector<bool> finished_processes(numOfResourceTypes, false);
 	int current_process;
-	for (int i = 0; i < num_of_processes; i++)
+	for (int i = 0; i < numOfProcesses; i++)
 	{
 		current_process = test_sequence[i] - 1;
 		for (int current_resource = 0; current_resource < 3; current_resource++)
