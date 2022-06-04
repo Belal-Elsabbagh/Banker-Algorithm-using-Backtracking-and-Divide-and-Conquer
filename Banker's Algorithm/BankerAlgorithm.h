@@ -27,6 +27,8 @@ private:
 	vector<int> sequence;
 	vector<vector<int>> safe_sequences;
 	void generate_safe_sequences(vector<int> sequence, int low, int high);
+	bool process_is_safe_to_run(int current_process, vector<int> work);
+	void run_process(int current_process, vector<int>& work);
 	template<class T>
 	void swap(T& x, T& y) 
 	{
@@ -87,6 +89,19 @@ void BankerAlgorithm::generate_safe_sequences(vector<int> sequence, int low, int
 	}
 }
 
+inline bool BankerAlgorithm::process_is_safe_to_run(int current_process, vector<int> work)
+{
+	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
+		if (need[current_process][current_resource] > work[current_resource]) return false;
+	return true;
+}
+
+inline void BankerAlgorithm::run_process(int current_process, vector<int>& work)
+{
+	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
+		work[current_resource] += allocation[current_process][current_resource];
+}
+
 inline void BankerAlgorithm::print_matrix(vector<vector<int>> mat)
 {
 	for (size_t i = 0; i < mat.size(); i++)
@@ -117,11 +132,8 @@ bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 	for (int i = 0; i < numOfProcesses; i++)
 	{
 		current_process = test_sequence[i] - 1;
-		for (int current_resource = 0; current_resource < 3; current_resource++)
-		{
-			if (need[current_process][current_resource] > work[current_resource]) return false;
-			work[current_resource] += allocation[current_process][current_resource];
-		}
+		if (!process_is_safe_to_run(current_process, work)) return false;
+		run_process(current_process, work);
 	}
 	return true;
 }
