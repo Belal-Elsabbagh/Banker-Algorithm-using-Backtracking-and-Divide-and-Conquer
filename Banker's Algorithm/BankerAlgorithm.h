@@ -203,8 +203,7 @@ void BankerAlgorithm::generate_safe_sequences(vector<int> sequence, int low, int
 {
 	if (low == high)
 	{
-		if (check_safety(sequence))
-			safe_sequences.push_back(sequence);
+		if (check_safety(sequence)) safe_sequences.push_back(sequence);
 		return;
 	}
 	for (int i = low; i <= high; i++)
@@ -233,12 +232,11 @@ bool BankerAlgorithm::check_safety(vector<int> test_sequence)
 inline bool BankerAlgorithm::process_is_safe_to_run(int current_process, vector<int> work)
 {
 	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
-		if (need[current_process][current_resource] > work[current_resource])
-			return false;
+		if (need[current_process][current_resource] > work[current_resource]) return false;
 	return true;
 }
 
-inline void BankerAlgorithm::run_process(int current_process, vector<int> &work)
+inline void BankerAlgorithm::run_process(int current_process, vector<int>& work)
 {
 	for (int current_resource = 0; current_resource < numOfResourceTypes; current_resource++)
 		work[current_resource] += allocation[current_process][current_resource];
@@ -255,7 +253,6 @@ bool BankerAlgorithm::request(size_t process, vector<int> requested_resource)
 		add_allocation(process, i, requested_resource.at(i));
 	}
 	get_safe_sequences();
-	if (safe_sequences.empty())
-		grant = false;
+	if (safe_sequences.empty()) grant = false;
 	return grant;
 }
